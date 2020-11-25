@@ -1,3 +1,4 @@
 .bundle/
 /Gemfile.lock
 modules_pdksync/
+gems_pdksync/
