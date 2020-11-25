@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+set -x
+echo control_repo
+tail -2 /usr/src/control-repo/Gemfile.lock
+
+getsecret() {
+  eyaml decrypt -e /usr/src/control-repo/data/secrets.yaml |
+    sed -n -e "/secrets::$1:/"'s/^.*pkcs7\[\(.*\)\]!/\1/p'
+}
+declare -x GITHUB_TOKEN
+GITHUB_TOKEN=$(getsecret github_token)
+declare -x BUNDLER_VERSION
+BUNDLER_VERSION="1.17.2"
+ 
+set -x
+declare -x PDKSYNC_CONFIG_PATH=pdksync.yml
+bundle exec rake pdksync
+declare -x PDKSYNC_CONFIG_PATH=pdksync_control_repo.yml
+bundle exec rake pdksync
