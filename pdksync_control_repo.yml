@@ -1,5 +1,0 @@
----
-namespace: 'mergwyn'
-#git_base_uri: 'git@github.com'
-create_pr_against: 'production'
-managed_modules: 'managed_modules_control_repo.yml'
