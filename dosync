@@ -25,6 +25,46 @@ if [[ -z "${GITHUB_TOKEN}" ]] ; then
   exit 3
 fi
  
-set -x
-PDKSYNC_CONFIG_PATH=pdksync.yml              bundle exec rake pdksync
-PDKSYNC_CONFIG_PATH=pdksync_control_repo.yml bundle exec rake pdksync
+managed_modules=$(mktemp --suffix .managed_modules.yml)
+pdksync=$(mktemp --suffix .pdksync.yml)
+managed_modules="managed_modules.yml"
+pdksync="pdksync.yml"
+finish() { rm -rf "${managed_modules}" "${pdksync}"; }
+trap finish exit
+
+runsync() {
+  local branch=$1
+  shift
+  local modules=("$@")
+
+  {
+    printf -- '---\n'
+    printf -- "- %s\n"  "${modules[@]}"
+  } > "${managed_modules}"
+  echo "running pdksync on modules:" >&2
+  cat "${managed_modules}" >&2
+
+  {
+    printf -- '---\n'
+    printf "namespace: 'mergwyn'\n"
+    printf  "create_pr_against: '%s'\n" "${branch}"
+    printf  "managed_modules: '%s'\n" "${managed_modules}"
+  } > "${pdksync}"
+  echo "running pdksync with config:" >&2
+  cat "${pdksync}" >&2
+
+  PDKSYNC_CONFIG_PATH="${pdksync}" bundle exec rake pdksync
+}
+
+mymodules=(
+mergwyn-backuppc
+mergwyn-ddclient
+mergwyn-jackett
+mergwyn-managedmac
+mergwyn-radarr
+mergwyn-xteve
+)
+
+runsync master "${mymodules[@]}"
+
+runsync production "control-repo"
