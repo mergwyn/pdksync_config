@@ -1,9 +1,24 @@
 #!/usr/bin/env bash
 
+src=/usr/src/control-repo
+installdir=.bundle
 
-cd /usr/src/pdksync/pdksync
-sudo $(which gem) install bundler
+
+if ! test -d "${src}" ; then
+  echo >&2 "Location of sample pdk repo $src not found"
+  exit 1
+fi
+
+
+BUNDLER_VERSION=$(tail -n1 "${src}/Gemfile.lock")
+if [[ -z "${BUNDLER_VERSION}" ]] ; then
+  echo >&2 "Unable to get bunder version from ${src}/Gemfile.lock"
+  exit 2
+fi
+
+sudo "$(command -v gem)" install bundler
 sudo apt install zlib1g-dev 
-sudo $(which gem) install bundler:1.17.2
-bundle install --path=.
-
+sudo "$(command -v gem)" install bundler:"${BUNDLER_VERSION}"
+rm Gemfile.lock
+export BUNDLER_VERSION
+bundle install --path="${installdir}"

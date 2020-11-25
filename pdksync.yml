@@ -1,4 +1,4 @@
 ---
 namespace: 'mergwyn'
 #git_base_uri: 'git@github.com'
-managed_modules: '../managed_modules.yml'
+managed_modules: 'managed_modules.yml'

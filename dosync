@@ -1,20 +1,30 @@
 #!/usr/bin/env bash
 
-set -x
-echo control_repo
-tail -2 /usr/src/control-repo/Gemfile.lock
+src=/usr/src/control-repo
+
+if ! test -d "${src}" ; then
+  echo >&2 "Location of sample pdk repo $src not found"
+  exit 1
+fi
+
+BUNDLER_VERSION=$(tail -n1 "${src}/Gemfile.lock")
+if [[ -z "${BUNDLER_VERSION}" ]] ; then
+  echo >&2 "Unable to get bunder version from ${src}/Gemfile.lock"
+  exit 2
+fi
+export BUNDLER_VERSION
 
 getsecret() {
-  eyaml decrypt -e /usr/src/control-repo/data/secrets.yaml |
-    sed -n -e "/secrets::$1:/"'s/^.*pkcs7\[\(.*\)\]!/\1/p'
+  eyaml decrypt -e "${src}"/data/secrets.yaml \
+  | sed -n -e "/secrets::$1:/"'s/^.*PKCS7\[\(.*\)\]!/\1/p'
 }
 declare -x GITHUB_TOKEN
 GITHUB_TOKEN=$(getsecret github_token)
-declare -x BUNDLER_VERSION
-BUNDLER_VERSION="1.17.2"
+if [[ -z "${GITHUB_TOKEN}" ]] ; then
+  echo >&2 "Unable to get GITHUB_TOKEN from secrets"
+  exit 3
+fi
  
 set -x
-declare -x PDKSYNC_CONFIG_PATH=pdksync.yml
-bundle exec rake pdksync
-declare -x PDKSYNC_CONFIG_PATH=pdksync_control_repo.yml
-bundle exec rake pdksync
+PDKSYNC_CONFIG_PATH=pdksync.yml              bundle exec rake pdksync
+PDKSYNC_CONFIG_PATH=pdksync_control_repo.yml bundle exec rake pdksync
