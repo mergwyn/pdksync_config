@@ -45,8 +45,8 @@ runsync() {
   {
     printf -- '---\n'
     printf "namespace: 'mergwyn'\n"
-    printf  "create_pr_against: '%s'\n" "${branch}"
-    printf  "managed_modules: '%s'\n" "${managed_modules}"
+    printf "create_pr_against: '%s'\n" "${branch}"
+    printf "managed_modules: '%s'\n" "${managed_modules}"
   } > "${pdksync}"
   echo "running pdksync with config:" >&2
   cat "${pdksync}" >&2
