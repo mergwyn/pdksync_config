@@ -1,0 +1,4 @@
+.bundle/
+/Gemfile.lock
+modules_pdksync/
+ruby/
