@@ -27,8 +27,6 @@ fi
  
 managed_modules=$(mktemp --suffix .managed_modules.yml)
 pdksync=$(mktemp --suffix .pdksync.yml)
-managed_modules="managed_modules.yml"
-pdksync="pdksync.yml"
 finish() { rm -rf "${managed_modules}" "${pdksync}"; }
 trap finish exit
 
@@ -56,15 +54,15 @@ runsync() {
   PDKSYNC_CONFIG_PATH="${pdksync}" bundle exec rake pdksync
 }
 
-mymodules=(
-mergwyn-backuppc
-mergwyn-ddclient
-mergwyn-jackett
-mergwyn-managedmac
-mergwyn-radarr
-mergwyn-xteve
+list=(
+  mergwyn-backuppc
+  mergwyn-ddclient
+  mergwyn-jackett
+  mergwyn-managedmac
+  mergwyn-radarr
+  mergwyn-xteve
 )
 
-runsync master "${mymodules[@]}"
+runsync master "${list[@]}"
 
 runsync production "control-repo"
