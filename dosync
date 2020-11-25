@@ -1,0 +1,11 @@
+echo control_repo
+tail -2 /usr/src/control-repo/Gemfile.lock
+
+set -x
+cd pdksync
+declare -x GITHUB_TOKEN="65c87e97a3c38d40ce1de1401129233dd083a46f"
+declare -x BUNDLER_VERSION="1.17.2"
+declare -x PDKSYNC_CONFIG_PATH=/usr/src/pdksync/pdksync.yml
+bundle exec rake pdksync
+declare -x PDKSYNC_CONFIG_PATH=/usr/src/pdksync/pdksync_control_repo.yml
+bundle exec rake pdksync

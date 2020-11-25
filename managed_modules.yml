@@ -1,0 +1,12 @@
+---
+#- control-repo
+- mergwyn-managedmac
+- mergwyn-jackett
+- mergwyn-radarr
+- mergwyn-ddclient
+- mergwyn-upnpc
+#- mergwyn-transmission
+#- mergwyn-xteve
+#- mergwyn-telly
+#- mergwyn-xteve
+#- mergwyn-backuppc
