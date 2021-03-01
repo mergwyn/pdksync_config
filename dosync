@@ -7,12 +7,12 @@ if ! test -d "${src}" ; then
   exit 1
 fi
 
-BUNDLER_VERSION=$(tail -n1 "${src}/Gemfile.lock")
-if [[ -z "${BUNDLER_VERSION}" ]] ; then
-  echo >&2 "Unable to get bunder version from ${src}/Gemfile.lock"
-  exit 2
-fi
-export BUNDLER_VERSION
+#BUNDLER_VERSION=$(tail -n1 "${src}/Gemfile.lock")
+#if [[ -z "${BUNDLER_VERSION}" ]] ; then
+  #echo >&2 "Unable to get bunder version from ${src}/Gemfile.lock"
+  #exit 2
+#fi
+#export BUNDLER_VERSION
 
 getsecret() {
   eyaml decrypt -e "${src}"/data/secrets.yaml \
@@ -24,6 +24,8 @@ if [[ -z "${GITHUB_TOKEN}" ]] ; then
   echo >&2 "Unable to get GITHUB_TOKEN from secrets"
   exit 3
 fi
+#bundle exec rake pdksync:show_config
+#exit
  
 managed_modules=$(mktemp --suffix .managed_modules.yml)
 pdksync=$(mktemp --suffix .pdksync.yml)
@@ -47,11 +49,12 @@ runsync() {
     printf "namespace: 'mergwyn'\n"
     printf "create_pr_against: '%s'\n" "${branch}"
     printf "managed_modules: '%s'\n" "${managed_modules}"
+    printf "module_is_authoritive: false\n"
   } > "${pdksync}"
   echo "running pdksync with config:" >&2
   cat "${pdksync}" >&2
 
-  PDKSYNC_CONFIG_PATH="${pdksync}" bundle exec rake pdksync
+  PDKSYNC_CONFIG_PATH="${pdksync}" bundle exec rake pdksync #:show_config
 }
 
 list=(
